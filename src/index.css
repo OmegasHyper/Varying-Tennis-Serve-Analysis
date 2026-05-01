@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Bebas+Neue&display=swap');
+
+:root {
+  --clay: #c97c40;
+  --clay-light: #e8a05c;
+  --grass: #4a7c59;
+  --grass-light: #6db88a;
+  --hard: #2563a8;
+  --hard-light: #4a9fd4;
+  --bg-dark: #0a0c0f;
+  --bg-card: #111318;
+  --bg-card-hover: #161b22;
+  --surface: #1c2230;
+  --border: rgba(255,255,255,0.07);
+  --text-primary: #f0f2f5;
+  --text-secondary: #8b95a1;
+  --text-muted: #4a5568;
+  --accent: #d4f56a;
+  --accent-dim: rgba(212,245,106,0.15);
+  --danger: #ff4d6d;
+  --warn: #ffd166;
+  --radius: 16px;
+  --radius-sm: 8px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* utility */
+.glass {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
