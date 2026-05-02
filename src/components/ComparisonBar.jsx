@@ -61,16 +61,16 @@ export default function ComparisonBar({ userFeatures, proBaseline, comparison, m
           <YAxis tick={{ fill: '#8b95a1', fontSize: 11 }} axisLine={false} tickLine={false} />
           <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
           <Legend wrapperStyle={{ paddingTop: 12, fontSize: 12, color: '#8b95a1' }} />
-          <Bar dataKey="You" radius={[4, 4, 0, 0]} name="You">
+          <Bar dataKey="Pro" fill="#ff4d6d" fillOpacity={0.85} radius={[4, 4, 0, 0]} name="Pro Baseline" />
+          <Bar dataKey="You" fill="#d4f56a" radius={[4, 4, 0, 0]} name="You">
             {data.map((entry, i) => (
               <Cell
                 key={`cell-you-${i}`}
-                fill={entry.delta >= 0 ? '#d4f56a' : '#ff4d6d'}
+                fill='#d4f56a'
                 fillOpacity={0.85}
               />
             ))}
           </Bar>
-          <Bar dataKey="Pro" fill="#c97c40" fillOpacity={0.55} radius={[4, 4, 0, 0]} name="Pro Baseline" />
         </BarChart>
       </ResponsiveContainer>
     </div>

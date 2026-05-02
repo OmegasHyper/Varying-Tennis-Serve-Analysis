@@ -96,7 +96,30 @@ export default function App() {
   const [error, setError] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
   const fileInputRef = useRef(null);
+
+  const NAV_LINKS = results ? [
+    { label: 'Results',   href: '#results'      },
+    { label: 'Footer',    href: '#footer-section' },
+  ] : [
+    { label: 'Home',    href: '#hero-video'   },
+    { label: 'Analyse', href: '#main-content' },
+    { label: 'Footer',  href: '#footer-section' },
+  ];
+
+  const FOOTER_NAV_LINKS = results ? [
+    { label: 'Results', href: '#results'      },
+  ] : [
+    { label: 'Home', href: '#hero-video'   },
+    { label: 'Analyse', href: '#main-content' },
+  ];
+
+  const handleNavLink = (href) => {
+    setMenuOpen(false);
+    const target = document.querySelector(href);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const LOADING_STEPS = ["Uploading match footage...", "Processing skeletal points...", "Comparing with pros...", "Generating biomechanical report..."];
 
@@ -291,7 +314,7 @@ export default function App() {
 
 
         {/* Nav */}
-        <nav className={`nav ${isScrolled ? 'scrolled' : ''}`}>
+        <nav className={`nav ${isScrolled ? 'scrolled' : ''} ${menuOpen ? 'menu-open' : ''}`}>
           <motion.a
             className="nav-logo"
             href="/"
@@ -302,11 +325,101 @@ export default function App() {
             <div className="nav-logo-icon" aria-hidden="true">🎾</div>
             <span className="nav-logo-text">ServeSense</span>
           </motion.a>
+
+          {/* Hamburger button */}
+          <motion.button
+            id="hamburger-btn"
+            className={`hamburger-btn ${menuOpen ? 'open' : ''}`}
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+          >
+            <span className="ham-bar" />
+            <span className="ham-bar" />
+            <span className="ham-bar" />
+          </motion.button>
         </nav>
+
+        {/* Mobile/hamburger slide-out menu */}
+        <AnimatePresence>
+          {menuOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                className="menu-backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                onClick={() => setMenuOpen(false)}
+                aria-hidden="true"
+              />
+
+              {/* Panel */}
+              <motion.nav
+                className="menu-panel"
+                aria-label="Site navigation"
+                initial={{ x: '100%', opacity: 0 }}
+                animate={{ x: '0%', opacity: 1 }}
+                exit={{ x: '100%', opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              >
+                {/* Panel header */}
+                <div className="menu-panel-header">
+                  <div className="menu-panel-logo">
+                    <div className="nav-logo-icon" aria-hidden="true" style={{ width: 40, height: 40, fontSize: '1.3rem' }}>🎾</div>
+                    <span className="nav-logo-text" style={{ fontSize: '1.6rem' }}>ServeSense</span>
+                  </div>
+                  <motion.button
+                    className="menu-close-btn"
+                    onClick={() => setMenuOpen(false)}
+                    aria-label="Close menu"
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    ✕
+                  </motion.button>
+                </div>
+
+                {/* Divider */}
+                <div className="menu-divider" />
+
+                {/* Nav links */}
+                <ul className="menu-links" role="list">
+                  {NAV_LINKS.map((link, i) => (
+                    <motion.li
+                      key={link.href}
+                      initial={{ opacity: 0, x: 30 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 30 }}
+                      transition={{ delay: 0.08 * i, duration: 0.28, ease: 'easeOut' }}
+                    >
+                      <button
+                        className="menu-link"
+                        onClick={() => handleNavLink(link.href)}
+                      >
+                        {/* <span className="menu-link-emoji" aria-hidden="true">{link.emoji}</span> */}
+                        <span className="menu-link-label">{link.label}</span>
+                        <span className="menu-link-arrow" aria-hidden="true">→</span>
+                      </button>
+                    </motion.li>
+                  ))}
+                </ul>
+
+                {/* Footer badge */}
+                <div className="menu-panel-footer">
+                  <span className="menu-badge">MediaPipe Powered</span>
+                </div>
+              </motion.nav>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* Hero Sections — Simplified for performance */}
         <div className="hero-sections-wrapper" style={{ display: results ? 'none' : 'block' }}>
-          <HeroVideo />
+          <div id="hero-video"><HeroVideo /></div>
 
           <section className="hero-static">
             {/* Wrapper centers ball via flexbox; GSAP only needs to animate x/scale on the ball */}
@@ -522,6 +635,7 @@ export default function App() {
             <AnimatePresence>
               {results && !loading && (
                 <motion.div
+                  id="results"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   style={{ marginBottom: '1.25rem' }}
@@ -534,6 +648,94 @@ export default function App() {
 
           </div>
         </main>
+
+        {/* ── About Footer ── */}
+        <footer id="footer-section" className="site-footer" aria-label="About ServeSense">
+          {/* Top shimmer line */}
+          <div className="footer-shimmer" aria-hidden="true" />
+
+          <div className="footer-inner">
+
+            {/* Brand column */}
+            <div className="footer-brand">
+              <div className="footer-logo">
+                <div className="nav-logo-icon" style={{ width: 42, height: 42, fontSize: '1.4rem' }} aria-hidden="true">🎾</div>
+                <span className="nav-logo-text" style={{ fontSize: '1.7rem' }}>ServeSense</span>
+              </div>
+              <p className="footer-desc">
+                We deliver a biomechanical analysis tool for tennis players and coaches.
+                Upload your footage, choose your surface, and get instant professional-grade
+                insights. <br/>Powered by MediaPipe pose estimation.
+              </p>
+              <div className="footer-badges">
+                <span className="footer-badge">🦴 MediaPipe</span>
+                <span className="footer-badge">⚡ Real-Time</span>
+              </div>
+            </div>
+
+            {/* Tech stack column */}
+            <div className="footer-col">
+              <h3 className="footer-col-title">Tech Stack</h3>
+              <ul className="footer-tech-list" role="list">
+                {[
+                  { icon: '⚛️', name: 'React',         sub: 'UI framework'         },
+                  { icon: '🐍', name: 'FastAPI',        sub: 'Backend API'          },
+                  { icon: '🦴', name: 'MediaPipe',      sub: 'Pose estimation'      },
+                  { icon: '🎞️', name: 'Framer Motion & GSAP',  sub: 'Animations'           },
+                  { icon: '📈', name: 'Recharts',       sub: 'Data visualisation'   },
+                ].map((t) => (
+                  <li key={t.name} className="footer-tech-item">
+                    <span className="footer-tech-icon" aria-hidden="true">{t.icon}</span>
+                    <span className="footer-tech-name">{t.name}</span>
+                    <span className="footer-tech-sub">{t.sub}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Courts column */}
+            <div className="footer-col">
+              <h3 className="footer-col-title">Supported Surfaces</h3>
+              <ul className="footer-courts-list" role="list">
+                {[
+                  { emoji: '🟫', name: 'Clay',  desc: 'Roland Garros style' },
+                  { emoji: '🟩', name: 'Grass', desc: 'Wimbledon style'     },
+                  { emoji: '🟦', name: 'Hard',  desc: 'US Open style'       },
+                ].map((c) => (
+                  <li key={c.name} className="footer-court-item">
+                    <span aria-hidden="true">{c.emoji}</span>
+                    <div>
+                      <div className="footer-court-name">{c.name}</div>
+                      <div className="footer-court-desc">{c.desc}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <h3 className="footer-col-title" style={{ marginTop: '1.75rem' }}>Quick Links</h3>
+              <ul className="footer-links-list" role="list">
+                {FOOTER_NAV_LINKS.map((l) => (
+                  <li key={l.href}>
+                    <button className="footer-nav-link" onClick={() => handleNavLink(l.href)}>
+                      <span className="footer-link-arrow" aria-hidden="true">→</span>
+                      {l.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+          </div>
+
+          {/* Bottom bar */}
+          <div className="footer-bottom">
+            <span className="footer-copy">
+              © {new Date().getFullYear()} ServeSense &mdash; Built for athletes, by athletes.
+            </span>
+            <span className="footer-bottom-badge">Team 5 &nbsp;·&nbsp; Assistive Technologies</span>
+          </div>
+        </footer>
+
       </ErrorBoundary>
     </div>
   );

@@ -51,7 +51,7 @@ export default function ResultsDashboard({ data, court, onReset }) {
             <span className={`meta-pill ${COURT_CLASS[metadata.court_type] || 'court-clay'}`}>
               {COURT_EMOJI[metadata.court_type]} {COURT_LABEL[metadata.court_type]} Court
             </span>
-            <span className="meta-pill" style={{ color: '#d4f56a', borderColor: 'rgba(212,245,106,0.3)', background: 'rgba(212,245,106,0.08)' }}>
+            <span className="meta-pill" style={{ color: "#ff4d6d", borderColor: "#ff4d6d", background: "rgba(255, 77, 109, 0.15)" }}>
               🏆 vs {metadata.reference_player}
             </span>
           </div>

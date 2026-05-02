@@ -79,8 +79,8 @@ export default function ComparisonRadar({ userFeatures, proBaseline, metrics }) 
           <Radar
             name="Pro Baseline"
             dataKey="Pro"
-            stroke="#c97c40"
-            fill="#c97c40"
+            stroke="#ff4d6d"
+            fill="#ff4d6d"
             fillOpacity={0.15}
             strokeWidth={2}
             strokeDasharray="5 3"
