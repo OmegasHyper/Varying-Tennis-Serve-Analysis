@@ -100,19 +100,19 @@ export default function App() {
   const fileInputRef = useRef(null);
 
   const NAV_LINKS = results ? [
-    { label: 'Results',   href: '#results'      },
-    { label: 'Footer',    href: '#footer-section' },
+    { label: 'Results', href: '#results' },
+    { label: 'Footer', href: '#footer-section' },
   ] : [
-    { label: 'Home',    href: '#hero-video'   },
-    { label: 'Analyse', href: '#main-content' },
-    { label: 'Footer',  href: '#footer-section' },
+    { label: 'Home', href: '#hero-video' },
+    { label: 'analyze', href: '#main-content' },
+    { label: 'Footer', href: '#footer-section' },
   ];
 
   const FOOTER_NAV_LINKS = results ? [
-    { label: 'Results', href: '#results'      },
+    { label: 'Results', href: '#results' },
   ] : [
-    { label: 'Home', href: '#hero-video'   },
-    { label: 'Analyse', href: '#main-content' },
+    { label: 'Home', href: '#hero-video' },
+    { label: 'analyze', href: '#main-content' },
   ];
 
   const handleNavLink = (href) => {
@@ -193,25 +193,25 @@ export default function App() {
         { scale: 0, opacity: 0, rotate: 0, x: 0 },
         { scale: 1, opacity: 1, rotate: 180, duration: 1.2, ease: "back.out(1.7)" }
       )
-      // Step 2: Ball holds, then slides left (Ending at -20vw as requested)
-      .to(".tennis-ball-transition", {
-        x: "-18vw",
-        rotate: -180,
-        duration: 4,
-        ease: "power2.in"
-      }, "+=3")
-      // Step 3: Hero-static text fades in (Targeting content only, so it doesn't move the ball)
-      .fromTo(".hero-static-content",
-        { opacity: 0, x: -30 },
-        { opacity: 1, x: 200, duration: 1.8, ease: "power2.out" },
-        "<3" 
-      )
-      // Step 4: Upload form reveals
-      .fromTo(".reveal-content-wrapper",
-        { opacity: 0, y: 60 },
-        { opacity: 1, y: 0, duration: 1, ease: "power2.out" },
-        "-=0.4"
-      );
+        // Step 2: Ball holds, then slides left (Ending at -20vw as requested)
+        .to(".tennis-ball-transition", {
+          x: "-18vw",
+          rotate: -180,
+          duration: 4,
+          ease: "power2.in"
+        }, "+=3")
+        // Step 3: Hero-static text fades in (Targeting content only, so it doesn't move the ball)
+        .fromTo(".hero-static-content",
+          { opacity: 0, x: -30 },
+          { opacity: 1, x: 200, duration: 1.8, ease: "power2.out" },
+          "<3"
+        )
+        // Step 4: Upload form reveals
+        .fromTo(".reveal-content-wrapper",
+          { opacity: 0, y: 60 },
+          { opacity: 1, y: 0, duration: 1, ease: "power2.out" },
+          "-=0.4"
+        );
     };
 
     // Wait for HeroVideo pin to be ready before calculating scroll positions
@@ -273,28 +273,28 @@ export default function App() {
     // Map ALL 7 backend feature_analysis keys to dashboard-friendly keys.
     // New keys vs old: mean_jump_cm, mean_knee_deg, mean_vel_deg_s
     const user_features = {
-      jump_height_cm:              fa.max_jump  ? +(fa.max_jump.user_value  * 100).toFixed(1) : null,
-      knee_flexion_angle_deg:      fa.min_knee  ? +(fa.min_knee.user_value).toFixed(1)         : null,
-      knee_angular_velocity_deg_s: fa.max_vel   ? +(fa.max_vel.user_value).toFixed(1)          : null,
-      horizontal_displacement_m:   fa.lat_disp  ? +(fa.lat_disp.user_value * 100).toFixed(1) : null,
-      ball_speed_kmh:              null,  // not tracked by extractor
+      jump_height_cm: fa.max_jump ? +(fa.max_jump.user_value * 100).toFixed(1) : null,
+      knee_flexion_angle_deg: fa.min_knee ? +(fa.min_knee.user_value).toFixed(1) : null,
+      knee_angular_velocity_deg_s: fa.max_vel ? +(fa.max_vel.user_value).toFixed(1) : null,
+      horizontal_displacement_m: fa.lat_disp ? +(fa.lat_disp.user_value * 100).toFixed(1) : null,
+      ball_speed_kmh: null,  // not tracked by extractor
     };
 
     const pro_baseline = {
-      jump_height_cm:              fa.max_jump  ? +(fa.max_jump.pro_mean  * 100).toFixed(1) : null,
-      knee_flexion_angle_deg:      fa.min_knee  ? +(fa.min_knee.pro_mean).toFixed(1)         : null,
-      knee_angular_velocity_deg_s: fa.max_vel   ? +(fa.max_vel.pro_mean).toFixed(1)          : null,
-      horizontal_displacement_m:   fa.lat_disp  ? +(fa.lat_disp.pro_mean * 100).toFixed(1)  : null,
-      ball_speed_kmh:              null,
+      jump_height_cm: fa.max_jump ? +(fa.max_jump.pro_mean * 100).toFixed(1) : null,
+      knee_flexion_angle_deg: fa.min_knee ? +(fa.min_knee.pro_mean).toFixed(1) : null,
+      knee_angular_velocity_deg_s: fa.max_vel ? +(fa.max_vel.pro_mean).toFixed(1) : null,
+      horizontal_displacement_m: fa.lat_disp ? +(fa.lat_disp.pro_mean * 100).toFixed(1) : null,
+      ball_speed_kmh: null,
     };
 
     // % deviation from pro mean (signed)
     const comparison_to_pro = {
-      jump_height_cm:              fa.max_jump  ? fa.max_jump.pct_deviation  : null,
-      knee_flexion_angle_deg:      fa.min_knee  ? fa.min_knee.pct_deviation  : null,
-      knee_angular_velocity_deg_s: fa.max_vel   ? fa.max_vel.pct_deviation   : null,
-      horizontal_displacement_m:   fa.lat_disp  ? fa.lat_disp.pct_deviation  : null,
-      ball_speed_kmh:              null,
+      jump_height_cm: fa.max_jump ? fa.max_jump.pct_deviation : null,
+      knee_flexion_angle_deg: fa.min_knee ? fa.min_knee.pct_deviation : null,
+      knee_angular_velocity_deg_s: fa.max_vel ? fa.max_vel.pct_deviation : null,
+      horizontal_displacement_m: fa.lat_disp ? fa.lat_disp.pct_deviation : null,
+      ball_speed_kmh: null,
     };
 
     // court_projection: flatten projections to { clay: [...], grass: [...], hard: [...] }
@@ -303,22 +303,22 @@ export default function App() {
     // feedback: collect full coaching data from feature_analysis
     const feedback = Object.entries(fa).map(([key, val]) => ({
       feature: key,
-      label:   val.label,
-      band:    val.band,
-      tip:     val.coaching_tip,
-      score:   val.performance_score,
+      label: val.label,
+      band: val.band,
+      tip: val.coaching_tip,
+      score: val.performance_score,
       z_score: val.z_score,
-      weight:  val.weight,
+      weight: val.weight,
       pro_std: val.pro_std,
-      pro_n:   val.pro_n,
+      pro_n: val.pro_n,
     }));
 
     return {
       metadata: {
-        court_type:       r.source_court,
-        overall_score:    r.overall_score,
+        court_type: r.source_court,
+        overall_score: r.overall_score,
         reference_player: 'Elite Pro Baseline',
-        video_id:         data.video_id || null,
+        video_id: data.video_id || null,
       },
       user_features,
       pro_baseline,
@@ -737,7 +737,7 @@ export default function App() {
               <p className="footer-desc">
                 We deliver a biomechanical analysis tool for tennis players and coaches.
                 Upload your footage, choose your surface, and get instant professional-grade
-                insights. <br/>Powered by MediaPipe pose estimation.
+                insights. <br />Powered by MediaPipe pose estimation.
               </p>
               <div className="footer-badges">
                 <span className="footer-badge">🦴 MediaPipe</span>
@@ -750,11 +750,11 @@ export default function App() {
               <h3 className="footer-col-title">Tech Stack</h3>
               <ul className="footer-tech-list" role="list">
                 {[
-                  { icon: '⚛️', name: 'React',         sub: 'UI framework'         },
-                  { icon: '🐍', name: 'Flask',        sub: 'Backend API'          },
-                  { icon: '🦴', name: 'MediaPipe',      sub: 'Pose estimation'      },
-                  { icon: '🎞️', name: 'Framer Motion & GSAP',  sub: 'Animations'           },
-                  { icon: '📈', name: 'Recharts',       sub: 'Data visualisation'   },
+                  { icon: '⚛️', name: 'React', sub: 'UI framework' },
+                  { icon: '🐍', name: 'Flask', sub: 'Backend API' },
+                  { icon: '🦴', name: 'MediaPipe', sub: 'Pose estimation' },
+                  { icon: '🎞️', name: 'Framer Motion & GSAP', sub: 'Animations' },
+                  { icon: '📈', name: 'Recharts', sub: 'Data visualisation' },
                 ].map((t) => (
                   <li key={t.name} className="footer-tech-item">
                     <span className="footer-tech-icon" aria-hidden="true">{t.icon}</span>
@@ -770,9 +770,9 @@ export default function App() {
               <h3 className="footer-col-title">Supported Surfaces</h3>
               <ul className="footer-courts-list" role="list">
                 {[
-                  { emoji: '🟫', name: 'Clay',  desc: 'Roland Garros style' },
-                  { emoji: '🟩', name: 'Grass', desc: 'Wimbledon style'     },
-                  { emoji: '🟦', name: 'Hard',  desc: 'US Open style'       },
+                  { emoji: '🟫', name: 'Clay', desc: 'Roland Garros style' },
+                  { emoji: '🟩', name: 'Grass', desc: 'Wimbledon style' },
+                  { emoji: '🟦', name: 'Hard', desc: 'US Open style' },
                 ].map((c) => (
                   <li key={c.name} className="footer-court-item">
                     <span aria-hidden="true">{c.emoji}</span>
