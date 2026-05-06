@@ -13,8 +13,10 @@ Run:
 """
 
 import os
+import re
+import uuid
 import tempfile
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
 from extractor import extract_features
@@ -26,6 +28,10 @@ CORS(app)  # allow frontend (any origin) to call these endpoints
 
 ALLOWED_EXTENSIONS = {"mp4", "mov", "avi", "mkv"}
 MAX_VIDEO_MB = 100
+
+# Directory for annotated output videos (created on startup)
+ANNOTATED_DIR = os.path.join(os.path.dirname(__file__), "annotated_videos")
+os.makedirs(ANNOTATED_DIR, exist_ok=True)
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -73,9 +79,12 @@ def analyze():
         os.unlink(tmp_path)
         return jsonify({"error": f"Video validation error: {str(e)}"}), 500
 
-    # ── 4. Extract features with MediaPipe ────────────────────────────────────
+    # ── 4. Extract features + generate annotated video ────────────────────────────
+    video_id       = str(uuid.uuid4())
+    annotated_path = os.path.join(ANNOTATED_DIR, f"{video_id}.mp4")
+
     try:
-        features = extract_features(tmp_path)
+        features = extract_features(tmp_path, annotated_path=annotated_path)
     except ValueError as e:
         os.unlink(tmp_path)
         return jsonify({"error": f"Feature extraction failed: {str(e)}"}), 422
@@ -95,9 +104,25 @@ def analyze():
 
     # ── 5. Return result ──────────────────────────────────────────────────────
     return jsonify({
-        "status":  "ok",
-        "result":  result,
+        "status":   "ok",
+        "result":   result,
+        "video_id": video_id,
     }), 200
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GET /video/<video_id>
+# Streams the annotated MP4 (with pose landmarks drawn) back to the frontend.
+# ─────────────────────────────────────────────────────────────────────────────
+
+@app.route("/video/<video_id>", methods=["GET"])
+def get_video(video_id):
+    if not re.match(r"^[0-9a-f\-]{36}$", video_id):
+        return jsonify({"error": "Invalid video ID"}), 400
+    video_path = os.path.join(ANNOTATED_DIR, f"{video_id}.mp4")
+    if not os.path.exists(video_path):
+        return jsonify({"error": "Video not found or expired"}), 404
+    return send_file(video_path, mimetype="video/mp4", conditional=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

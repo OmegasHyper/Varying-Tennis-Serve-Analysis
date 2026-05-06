@@ -270,15 +270,13 @@ export default function App() {
     const r = data.result;
     const fa = r.feature_analysis;
 
-    // Map feature_analysis keys → flat user_features & pro_baseline objects
-    // backend keys: min_knee, mean_knee, max_jump, mean_jump, max_vel, mean_vel, lat_disp
-    // dashboard keys: jump_height_cm, knee_flexion_angle_deg, knee_angular_velocity_deg_s,
-    //                 horizontal_displacement_m, ball_speed_kmh  (ball_speed not in backend → null)
+    // Map ALL 7 backend feature_analysis keys to dashboard-friendly keys.
+    // New keys vs old: mean_jump_cm, mean_knee_deg, mean_vel_deg_s
     const user_features = {
       jump_height_cm:              fa.max_jump  ? +(fa.max_jump.user_value  * 100).toFixed(1) : null,
       knee_flexion_angle_deg:      fa.min_knee  ? +(fa.min_knee.user_value).toFixed(1)         : null,
       knee_angular_velocity_deg_s: fa.max_vel   ? +(fa.max_vel.user_value).toFixed(1)          : null,
-      horizontal_displacement_m:   fa.lat_disp  ? +(fa.lat_disp.user_value).toFixed(3)         : null,
+      horizontal_displacement_m:   fa.lat_disp  ? +(fa.lat_disp.user_value * 100).toFixed(1) : null,
       ball_speed_kmh:              null,  // not tracked by extractor
     };
 
@@ -286,7 +284,7 @@ export default function App() {
       jump_height_cm:              fa.max_jump  ? +(fa.max_jump.pro_mean  * 100).toFixed(1) : null,
       knee_flexion_angle_deg:      fa.min_knee  ? +(fa.min_knee.pro_mean).toFixed(1)         : null,
       knee_angular_velocity_deg_s: fa.max_vel   ? +(fa.max_vel.pro_mean).toFixed(1)          : null,
-      horizontal_displacement_m:   fa.lat_disp  ? +(fa.lat_disp.pro_mean).toFixed(3)         : null,
+      horizontal_displacement_m:   fa.lat_disp  ? +(fa.lat_disp.pro_mean * 100).toFixed(1)  : null,
       ball_speed_kmh:              null,
     };
 
@@ -302,7 +300,7 @@ export default function App() {
     // court_projection: flatten projections to { clay: [...], grass: [...], hard: [...] }
     const court_projection = r.projections || {};
 
-    // feedback: collect coaching tips from feature_analysis
+    // feedback: collect full coaching data from feature_analysis
     const feedback = Object.entries(fa).map(([key, val]) => ({
       feature: key,
       label:   val.label,
@@ -310,6 +308,9 @@ export default function App() {
       tip:     val.coaching_tip,
       score:   val.performance_score,
       z_score: val.z_score,
+      weight:  val.weight,
+      pro_std: val.pro_std,
+      pro_n:   val.pro_n,
     }));
 
     return {
@@ -317,12 +318,14 @@ export default function App() {
         court_type:       r.source_court,
         overall_score:    r.overall_score,
         reference_player: 'Elite Pro Baseline',
+        video_id:         data.video_id || null,
       },
       user_features,
       pro_baseline,
       comparison_to_pro,
       court_projection,
       feedback,
+      feature_analysis: r.feature_analysis,  // raw data for per-card rich stats
     };
   };
 

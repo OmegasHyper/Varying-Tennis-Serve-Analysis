@@ -9,10 +9,10 @@ import {
 } from 'recharts';
 
 const SHORT_LABELS = {
-  jump_height_cm:              'Jump',
-  knee_flexion_angle_deg:      'Knee Flex',
+  jump_height_cm:              'Peak Jump',
+  knee_flexion_angle_deg:      'Min Knee°',
   knee_angular_velocity_deg_s: 'Angular Vel',
-  horizontal_displacement_m:   'Displacement',
+  horizontal_displacement_m:   'Lateral Disp',
   ball_speed_kmh:              'Ball Speed',
 };
 
@@ -20,7 +20,7 @@ const MAXES = {
   jump_height_cm:              60,
   knee_flexion_angle_deg:      180,
   knee_angular_velocity_deg_s: 800,
-  horizontal_displacement_m:   1.5,
+  horizontal_displacement_m:   150,
   ball_speed_kmh:              250,
 };
 

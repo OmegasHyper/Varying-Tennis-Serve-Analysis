@@ -17,6 +17,12 @@ import tempfile
 import os
 import urllib.request
 
+try:
+    import imageio
+    _IMAGEIO_OK = True
+except ImportError:
+    _IMAGEIO_OK = False
+
 # ── Download model once on first import ──────────────────────────────────────
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "pose_landmarker.task")
@@ -39,6 +45,41 @@ TARGET_LANDMARKS = {
     27: "left_ankle", 28: "right_ankle",
 }
 
+# ── Overlay drawing constants ─────────────────────────────────────────────────
+
+_NAME_TO_IDX = {v: k for k, v in TARGET_LANDMARKS.items()}
+
+SKELETON_CONNECTIONS = [
+    ("left_hip",   "left_knee"),
+    ("left_knee",  "left_ankle"),
+    ("right_hip",  "right_knee"),
+    ("right_knee", "right_ankle"),
+    ("left_hip",   "right_hip"),
+]
+
+_JOINT_COLOR    = ( 82, 245, 212)   # BGR: cyan-green fill
+_SKELETON_COLOR = ( 50, 220, 100)   # BGR: green line
+_WHITE          = (255, 255, 255)
+
+
+def _draw_pose(frame, landmarks, width, height):
+    """Draw skeleton lines + joint circles onto a BGR frame (in-place)."""
+    # Connections
+    for a, b in SKELETON_CONNECTIONS:
+        ai, bi = _NAME_TO_IDX.get(a), _NAME_TO_IDX.get(b)
+        if ai is None or bi is None:
+            continue
+        lm_a, lm_b = landmarks[ai], landmarks[bi]
+        pt1 = (int(lm_a.x * width), int(lm_a.y * height))
+        pt2 = (int(lm_b.x * width), int(lm_b.y * height))
+        cv2.line(frame, pt1, pt2, _SKELETON_COLOR, 2, cv2.LINE_AA)
+    # Joints
+    for idx in TARGET_LANDMARKS:
+        lm = landmarks[idx]
+        cx, cy = int(lm.x * width), int(lm.y * height)
+        cv2.circle(frame, (cx, cy), 6, _JOINT_COLOR, -1, cv2.LINE_AA)
+        cv2.circle(frame, (cx, cy), 8, _WHITE, 1, cv2.LINE_AA)
+
 # ── Geometry helper ───────────────────────────────────────────────────────────
 
 def calculate_angle(a, b, c):
@@ -50,12 +91,13 @@ def calculate_angle(a, b, c):
 
 # ── Main extraction function ──────────────────────────────────────────────────
 
-def extract_features(video_path: str) -> dict:
+def extract_features(video_path: str, annotated_path: str = None) -> dict:
     """
     Run MediaPipe on a video file and return the biomechanical feature dict.
 
     Args:
-        video_path: absolute path to the uploaded video file
+        video_path:     absolute path to the uploaded video file
+        annotated_path: optional path to write an annotated MP4 with pose overlay
 
     Returns:
         {
@@ -97,6 +139,29 @@ def extract_features(video_path: str) -> dict:
     )
 
     cap = cv2.VideoCapture(video_path)
+
+    # ── Optional annotated video writer ───────────────────────────────────────
+    writer    = None
+    _use_iio  = False
+    if annotated_path:
+        if _IMAGEIO_OK:
+            try:
+                writer = imageio.get_writer(
+                    annotated_path,
+                    fps=fps,
+                    codec="libx264",
+                    quality=None,
+                    ffmpeg_params=["-movflags", "+faststart",
+                                   "-pix_fmt",   "yuv420p",
+                                   "-crf",        "23"],
+                )
+                _use_iio = True
+            except Exception:
+                pass   # fall back to OpenCV
+        if not _use_iio:
+            fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+            writer = cv2.VideoWriter(annotated_path, fourcc, fps, (width, height))
+
     with PoseLandmarker.create_from_options(options) as landmarker:
         frame_index = 0
         while cap.isOpened():
@@ -117,7 +182,21 @@ def extract_features(video_path: str) -> dict:
                         "x": round(lm.x * width, 2),
                         "y": round(lm.y * height, 2),
                     })
+
+            # Write annotated frame (draw pose if detected)
+            if writer is not None:
+                annotated = frame.copy()
+                if det.pose_landmarks:
+                    _draw_pose(annotated, det.pose_landmarks[0], width, height)
+                if _use_iio:
+                    writer.append_data(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB))
+                else:
+                    writer.write(annotated)
+
             frame_index += 1
+
+    if writer is not None:
+        writer.close() if _use_iio else writer.release()
     cap.release()
 
     if not rows:
