@@ -1,4 +1,4 @@
-# 🎾 ServeSense — Tennis Serve Analysis
+# 🎾 ServeSense — Tennis Serve Analysis System
 
 A full-stack biomechanical analysis tool for tennis players and coaches.  
 Upload a serve video, choose your court surface, and receive instant professional-grade feedback powered by **MediaPipe pose estimation**.
